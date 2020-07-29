@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        @import url(https://fonts.googleapis.com/earlyaccess/cwtexyen.css);
+
+        body {
+            margin: 0px;
+            overflow: hidden;
+            font-family: 'cwTeXYen', sans-serif;
+            background-image: url(./myPic/BG.jpg);
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-size: cover;
+            /* background-image: linear-gradient(-225deg, #FFFEFF 0%, #D7FFFE 100%); */
+        }
+
+        #mainFrame {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+        }
+
+        #canvasMain {
+            margin: auto;
+            background-color: rgb(255, 255, 255);
+            /* border: gray 1px solid; */
+            border-radius: 20px;
+            box-shadow: 0px 0px 50px rgb(0, 0, 0, 0.2);
+            width: 900px;
+            height: 550px;
+            display: flex;
+        }
+
+        form {
+            padding: 50px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1 {
+            font-weight: normal;
+            margin-top: 10px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        label,
+        #pic {
+            margin-top: 20px;
+
+        }
+
+        .formFlex {
+            display: inline-block;
+            margin-top: 20px;
+        }
+
+        #submitBtn {
+            margin-top: 30px;
+        }
+
+        #myCanvas {
+            border-radius: 20px;
+            margin: auto;
+        }
+
+        #canvasDiv {
+            display: inline-flex;
+        }
+
+        #myForm {
+            width: 400px;
+        }
+
+        #pic {
+            display: inline;
+            margin: 0px;
+        }
+
+        #downLoad {
+            text-align: center;
+            margin: auto;
+            width: 100px;
+            margin-top: 30px;
+            padding: 10px;
+            background-color: rgb(152, 211, 208);
+            border-radius: 50px;
+            text-decoration: none;
+            color: rgb(39, 39, 39);
+        }
+
+        #picBlock {
+            display: none;
+        }
+
+        .textInfo {
+            color: rgb(235, 102, 142);
+            font-weight: bold;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="mainFrame">
+        <div id="canvasMain">
+            <div id="myForm">
+
+                <form action="">
+                    <h1>長輩圖產生器</h1>
+
+                    <div class="formFlex">
+                        <label for="textInner">🌞請選擇圖片</label>
+                        <select name="pic" id="pic" onchange="sPic()">
+                            <option value="A">純潔蓮花</option>
+                            <option value="B">和藹太陽</option>
+                            <option value="C">美麗蝴蝶</option>
+                            <option value="D">智慧猴子</option>
+                            <option value="E">保佑大佛</option>
+                            <option value="F">浪漫夕陽</option>
+                        </select>
+                    </div>
+
+
+                    <div class="formFlex">
+                        <label for="textInner">🌞請輸入文字</label>
+                        <input type="text" id="textInner" name="text" onchange="tInput()" placeholder="請輸入文字">
+                        <div class="textInfo">（拖曳文字可以移動文字位置）</div>
+                    </div>
+
+
+
+                    <div class="formFlex">
+                        <label for="textColor">🌞文字顏色</label>
+                        <input type="color" id="inputColor" name="text" value="#ff0000">
+                    </div>
+
+                    <label for="textSize">🌞文字大小</label>
+
+                    <input type="range" id="textSize" name="text" min="10" max="80" ">
+
+                    <div class=" formFlex">
+                    <label for="textColor">🌞文字邊框顏色</label>
+                    <input type="color" id="fontStrokeColor"" name=" text" value="#0000ff">
+            </div>
+
+
+            <label for="fontStrokeWidth">🌞文字邊框粗細</label>
+            <input type="range" id="fontStrokeWidth" name="text" min="1" max="10">
+
+
+            <!-- 水平和垂直位置 -->
+            <input type="range" id="textX" name="text" min="0" max="450" style="display: none">
+            <input type="range" id="textY" name="text" min="0" max="400" style="display: none">
+
+            <a href="#" id="downLoad" download="長輩圖.png">下載</a>
+
+            </form>
+        </div>
+
+        <div id="canvasDiv"> <canvas id="myCanvas" width="450" height="400"></canvas></div>
+
+
+    </div>
+    </div>
+
+    <div id="picBlock">
+        <img id="A" src="./myPic/A.jpeg" alt="">
+        <img id="B" src="./myPic/B.jpg" alt="">
+        <img id="C" src="./myPic/C.jpg" alt="">
+        <img id="D" src="./myPic/D.jpg" alt="">
+        <img id="E" src="./myPic/E.jpg" alt="">
+        <img id="F" src="./myPic/F.jpg" alt="">
+    </div>
+    <script>
+
+        window.onload = init;
+
+        var c = document.getElementById("myCanvas");
+        var ctx = c.getContext("2d");
+        var canvasPic = document.getElementById("pic");
+
+        // 文字內容
+        var inputText = document.getElementById("textInner");
+
+        // 文字顏色
+        var inputColor = document.getElementById("inputColor");
+
+        // 文字大小
+        var fontSize = document.getElementById("textSize");
+
+
+        //   文字邊框顏色
+        var textStroke = document.getElementById("fontStrokeColor");
+
+        // 文字邊框粗細
+        var strokeWidth = document.getElementById("fontStrokeWidth");
+        var x = document.getElementById("textX");
+        var y = document.getElementById("textY");
+
+
+        window.addEventListener('load', function () {
+            c.addEventListener('mousedown', mouseDown);
+            c.addEventListener('mousemove', mouseMove);
+            c.addEventListener('mouseup', mouseUp);
+            inputText.addEventListener("input", tInput);
+            fontSize.addEventListener("input", tInput);
+            inputColor.addEventListener("input", tInput);
+            textStroke.addEventListener("input", tInput);
+            strokeWidth.addEventListener("input", tInput);
+        })
+
+        // 初始
+        function init() {
+            var c = document.getElementById("myCanvas");
+            var ctx = c.getContext("2d");
+            ctx.drawImage(A, 0, 0, 450, 400);
+            downLoad.href = myCanvas.toDataURL("image/png");
+        };
+
+        function sPic() {
+
+            changePic();
+            // console.log(canvasPic.value);
+
+
+        }
+
+        function changePic() {
+            switch (canvasPic.value) {
+                case "A":
+                    ctx.drawImage(A, 0, 0, 450, 400);
+                    cancasSet();
+                    break;
+                case "B":
+                    ctx.drawImage(B, 0, 0, 450, 400);
+                    cancasSet();
+                    break;
+                case "C":
+                    ctx.drawImage(C, 0, 0, 450, 400);
+                    cancasSet();
+                    break;
+                case "D":
+                    ctx.drawImage(D, 0, 0, 450, 400);
+                    cancasSet();
+                    break;
+                case "E":
+                    ctx.drawImage(E, 0, 0, 450, 400);
+                    cancasSet();
+                    break;
+                case "F":
+                    ctx.drawImage(F, 0, 0, 450, 400);
+                    cancasSet();
+                    break;
+            }
+        }
+
+
+
+        // sildeBar預設
+        x.value = 0;
+        y.value = 0;
+        strokeWidth.value = 1;
+
+        // 文字改變的時候執行
+        function tInput() {
+            changePic();
+            cancasSet();
+        };
+
+
+        // 改變
+        function cancasSet() {
+
+            // ctx.globalCompositeOperation = "copy";
+            // ctx.globalCompositeOperation = 'source-over';
+            ctx.font = `${fontSize.value}px 標楷體`;
+            ctx.fillStyle = inputColor.value;
+            ctx.strokeStyle = textStroke.value;
+            ctx.lineWidth = strokeWidth.value;
+
+            ctx.textBaseline = "top";
+            ctx.textAlign = "left";
+            // 文字不超出
+            var fontW = ctx.measureText(inputText.value).width
+            x.max = 450 - fontW;
+            y.max = 400 - fontSize.value;
+            ctx.strokeText(inputText.value, x.value, y.value);
+            ctx.fillText(inputText.value, x.value, y.value);
+            downLoad.href = myCanvas.toDataURL("image/png");
+        }
+
+
+
+
+        // 滑鼠事件
+        function mouseDown(e) {
+            this.draw = true;
+
+        }
+
+
+        function mouseMove(e) {
+            if (this.draw) {
+                this.offsetX = this.offsetLeft;
+                this.offsetY = this.offsetTop;
+                x.value = e.pageX - this.offsetX
+                y.value = e.pageY - this.offsetY
+                // console.log(x.value)
+                changePic();
+                cancasSet();
+            }
+
+
+        }
+        function mouseUp(e) {
+            this.draw = false;
+
+        }
+
+    </script>
+</body>
+
+</html>
